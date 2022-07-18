@@ -196,7 +196,7 @@ public class PortfolioManagerApplication {
   public static List<PortfolioTrade> readTradesFromJson(String filename)
       throws IOException, URISyntaxException {
     
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = getObjectMapper();
     File file = resolveFileFromResources(filename);
     PortfolioTrade[] trades = objectMapper.readValue(file, PortfolioTrade[].class);
 
@@ -207,8 +207,6 @@ public class PortfolioManagerApplication {
     return ptd;
 
   }
-
-
 
   // TODO:
   // Build the Url using given parameters and use this function in your code to cann the API.
