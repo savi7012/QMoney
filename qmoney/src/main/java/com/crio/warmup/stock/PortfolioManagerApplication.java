@@ -16,20 +16,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 import org.apache.logging.log4j.ThreadContext;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.apache.logging.log4j.ThreadContext;
-import org.springframework.cglib.core.TinyBitSet;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
@@ -80,6 +68,7 @@ public class PortfolioManagerApplication {
   private static File resolveFileFromResources(String filename) throws URISyntaxException {
     return Paths.get(Thread.currentThread().getContextClassLoader().getResource(filename).toURI())
         .toFile();
+
   }
 
   private static ObjectMapper getObjectMapper() {
@@ -206,8 +195,19 @@ public class PortfolioManagerApplication {
   // ./gradlew test --tests PortfolioManagerApplicationTest.mainReadFile
   public static List<PortfolioTrade> readTradesFromJson(String filename)
       throws IOException, URISyntaxException {
-    return Collections.emptyList();
+    
+    ObjectMapper objectMapper = new ObjectMapper();
+    File file = resolveFileFromResources(filename);
+    PortfolioTrade[] trades = objectMapper.readValue(file, PortfolioTrade[].class);
+
+    ArrayList<PortfolioTrade> ptd = new ArrayList<>();
+    for (PortfolioTrade t : trades) {
+      ptd.add(t);
+    }
+    return ptd;
+
   }
+
 
 
   // TODO:
@@ -225,17 +225,15 @@ public class PortfolioManagerApplication {
   
 
 
-
-
   public static void main(String[] args) throws Exception {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
 
     // printJsonObject(mainReadFile(args));
 
-
-
-    printJsonObject(mainReadQuotes(args));
+    // printJsonObject(mainReadQuotes(args));
+    List<PortfolioTrade> trades = readTradesFromJson("assessments/trades.json");
+    System.out.println(trades);
 
 
   }
