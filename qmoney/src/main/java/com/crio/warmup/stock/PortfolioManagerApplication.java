@@ -217,7 +217,6 @@ public class PortfolioManagerApplication {
          trade.getSymbol(), trade.getPurchaseDate(), endDate, token);
 
     return url;
-    // return Collections.emptyList();
 
   }
   
@@ -229,9 +228,9 @@ public class PortfolioManagerApplication {
 
     // printJsonObject(mainReadFile(args));
 
-    // printJsonObject(mainReadQuotes(args));
-    List<PortfolioTrade> trades = readTradesFromJson("assessments/trades.json");
-    System.out.println(trades);
+    printJsonObject(mainReadQuotes(args));
+    // List<PortfolioTrade> trades = readTradesFromJson("assessments/trades.json");
+    // System.out.println(trades);
 
 
   }
