@@ -4,14 +4,20 @@ package com.crio.warmup.stock;
 
 import com.crio.warmup.stock.dto.*;
 import com.crio.warmup.stock.log.UncaughtExceptionHandler;
+import com.crio.warmup.stock.portfolio.PortfolioManager;
+import com.crio.warmup.stock.portfolio.PortfolioManagerFactory;
+import com.crio.warmup.stock.portfolio.PortfolioManagerImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -22,7 +28,8 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import org.springframework.web.client.RestTemplate;
 import java.util.*;
-import java.time.temporal.ChronoUnit;;
+import java.time.temporal.ChronoUnit;
+import com.crio.warmup.stock.portfolio.PortfolioManager;
 
 public class PortfolioManagerApplication {
 
@@ -325,6 +332,24 @@ public class PortfolioManagerApplication {
 
 
 
+  public static List<AnnualizedReturn> mainCalculateReturnsAfterRefactor(String[] args)
+      throws Exception {
+       String file = args[0];
+       LocalDate endDate = LocalDate.parse(args[1]);
+       String filename = readFileAsString(file);
+       ObjectMapper objectMapper = getObjectMapper();
+       PortfolioTrade[] portfolioTrades = objectMapper.readValue(filename, PortfolioTrade[].class);
+       RestTemplate restTemplate = new RestTemplate();
+       PortfolioManager portfolioManager = PortfolioManagerFactory.getPortfolioManager(restTemplate);
+       return portfolioManager.calculateAnnualizedReturn(Arrays.asList(portfolioTrades), endDate);
+  }
+
+  private static String readFileAsString(String filename) throws URISyntaxException, IOException {
+
+    return new String(Files.readAllBytes(resolveFileFromResources(filename).toPath()), "UTF-8");
+  }
+
+
   public static void main(String[] args) throws Exception {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
@@ -336,10 +361,12 @@ public class PortfolioManagerApplication {
     // List<PortfolioTrade> trades = readTradesFromJson("assessments/trades.json");
     // System.out.println(trades);
     // printJsonObject(mainCalculateSingleReturn(args));
-
-
+    // System.out.println(args);
+    // printJsonObject(mainCalculateReturnsAfterRefactor(args));
   }
 }
+
+
 
 
 // class AnnualizedReturnComapartor implements Comparator<AnnualizedReturn> {
@@ -373,6 +400,6 @@ class TotalReturnsDtoComparator implements Comparator<TotalReturnsDto> {
     else {
       return -1;
     }
+
   }
 }
-
